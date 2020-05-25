@@ -7,11 +7,21 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace DSS_Platform_DotNetSDK.Lib.Commons
 {
     public static class Tools
     {
+
+        static Tools()
+        {
+            jsonSerializerSettings= new Newtonsoft.Json.JsonSerializerSettings();
+            jsonSerializerSettings.NullValueHandling=NullValueHandling.Ignore;
+        }
+
+
+
         public static long NewID { get => DateTime.Now.ToTimestamp(true) * 1000 + GeneratteRandom(3); }
         //public static string NewID { get => DateTime.Now.ToTimestamp(true); }
 
@@ -183,6 +193,14 @@ namespace DSS_Platform_DotNetSDK.Lib.Commons
             {
                 return day + "天" + hour + "时" + minute + "分" + second + "秒";
             }
+        }
+
+        private static Newtonsoft.Json.JsonSerializerSettings jsonSerializerSettings=null;
+
+
+        public static string ToJson(Object data)
+        {
+          return  Newtonsoft.Json.JsonConvert.SerializeObject(data,jsonSerializerSettings);
         }
 
 

@@ -7,11 +7,11 @@ namespace DSS_Platform_DotNetSDK.Lib.Models.Req
     {
         public BaseParam()
         {
-            param=new Dictionary<string, object>();
+            //param=new Dictionary<string, object>();
             // locale="zh-CN";
         }
 
-        public Dictionary<string, object> param { get; set; }
+        public object param { get; set; }
 
         public Authorinize authorinize { get; set; }
 
