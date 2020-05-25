@@ -1,9 +1,8 @@
 # DSS_Platform
-大华智慧平台对接
+## 大华智慧平台对接
+## 大华智慧园区综合管理平台对外开放接口
 
-大华智慧园区综合管理平台对外开放接口
-
->   [Gitub项目地址](https://github.com/MingZhuLiu/DSS_Platform_DotNetSDK)
+### [Gitub项目地址](https://github.com/MingZhuLiu/DSS_Platform_DotNetSDK)
 
 
 > 核心类库DSS_Platform_DotNetSDK.Lib
@@ -17,3 +16,5 @@
 > 所有接口均在大华的返回值后又包装了一层泛型BaseModel,用于捕获异常.
 
 > Nuget 引用 dotnet add package DSS_Platform_DotNetSDK.Lib
+
+##### (注:大华卡片密码当前是写死的,具体RSA算法还不清楚,要求100位以内的长度,有清楚的大神可以给我提供建议)
