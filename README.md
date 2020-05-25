@@ -1,6 +1,8 @@
 # DSS_Platform
 大华智慧平台对接
 
+大华智慧园区综合管理平台对外开放接口
+
 >   [Gitub项目地址](https://github.com/MingZhuLiu/DSS_Platform_DotNetSDK)
 
 
