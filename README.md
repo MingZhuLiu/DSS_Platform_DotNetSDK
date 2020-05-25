@@ -1,6 +1,7 @@
 # DSS_Platform
 大华智慧平台对接
 
+>   [Gitub项目地址](https://github.com/MingZhuLiu/DSS_Platform_DotNetSDK)
 
 
 > 核心类库DSS_Platform_DotNetSDK.Lib
