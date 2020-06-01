@@ -2,6 +2,7 @@ namespace DSS_Platform_DotNetSDK.Lib.Models.Req
 {
     public class PersonDtoReq
     {
+        public long id { get; set; }
         public string birthday { get; set; }
         public string name { get; set; }
         public string code { get; set; }

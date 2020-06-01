@@ -30,6 +30,8 @@ namespace DSS_Platform_DotNetSDK.Control
 
 
 
+
+
             PersonModel personModel = new PersonModel();
             var departments = dSSClient.QueryDept();
             var deptIdsArr = departments.Data.data.Select(p => p.id).ToArray();
@@ -43,36 +45,64 @@ namespace DSS_Platform_DotNetSDK.Control
             while (true)
             {
 
-
-
-
                 PersonDtoReq person = new PersonDtoReq();
-                person.birthday = "2019-02-12";
-                person.cardNumber = 320204198402140027.ToString();
-                person.code = "59eb648a7a7949a1b";
+                // person.birthday = "2019-02-12";
+                // person.cardNumber = xxxxxxxxx.ToString();
+                person.code = "xxxxxxxxx";
                 person.deptId = deptIdsStr;
                 person.name = "法外狂徒-云龙";
-                person.paperNumber = "BY10010";
+                person.paperNumber = "BY100103";
                 person.paperType = "学生证";
                 person.personIdentityId = "-99";
-                person.phone = "13912345678";
+                person.phone = "18918594330";
                 person.sex = "男";
                 person.status = "在职";
-                long peresonId=0;
-                var persons = dSSClient.QueryPersonList(new Lib.Models.Req.PersonQueryReq() { pageNum = 1, pageSize = 1000, deptIdsString = deptIdsStr, cardNumber = person.cardNumber });
+
+
+                // PersonDtoReq person = new PersonDtoReq();
+                // person.birthday = "2019-02-12";
+                // person.cardNumber = xxxxxxxxx.ToString();
+                // person.code = "59eb648a7a7949a1b";
+                // person.deptId = deptIdsStr;
+                // person.name = "法外狂徒-云龙";
+                // person.paperNumber = "BY100103";
+                // person.paperType = "学生证";
+                // person.personIdentityId = "-99";
+                // person.phone = "";
+                // person.sex = "男";
+                // person.status = "在职";
+
+
+                long peresonId = 0;
+                var persons = dSSClient.QueryPersonList(new Lib.Models.Req.PersonQueryReq() { pageNum = 1, pageSize = 1000, deptIdsString = "1", code = "xxxxxxxxx" });
                 if (persons.Data.data.totalRows != 0)
                 {
 
-                    PersonModel pm = persons.Data.data.pageData.FirstOrDefault();
-                    peresonId=pm.id;
+
+                    PersonDtoReq pm = new PersonDtoReq();
+                    pm.id = persons.Data.data.pageData.FirstOrDefault().id;
+                    pm.status = "离职";
+                    pm.name = "测试修改姓名";
+                    pm.personIdentityId = "-99";
+                    pm.sex = "女";
+                    pm.paperNumber="320102196801230000";
+                    pm.paperType="身份证";
+                    pm.code="xxxxxxxxx";
+                    pm.deptId="1";
+                    var xxx = dSSClient.UpdatePerson(pm);
+
+
+                    // peresonId = pm.id;
                     // person.code = pm.code;
-                    
+
+
+
                 }
                 else
                 {
                     var resp = dSSClient.AddPerson(person);
-                    peresonId=resp.Data.data.Value;
-                    
+                    peresonId = resp.Data.data.Value;
+
                 }
 
 
@@ -85,7 +115,7 @@ namespace DSS_Platform_DotNetSDK.Control
                 fileStream.Close();
 
                 ImageReq imageReq = new ImageReq();
-                imageReq.personCode = "59eb648a7a7949a1b";
+                imageReq.personCode = "xxxxxxxxx";
                 imageReq.base64file = Convert.ToBase64String(buffer);
                 var imageResp = dSSClient.SaveImage(imageReq);
 

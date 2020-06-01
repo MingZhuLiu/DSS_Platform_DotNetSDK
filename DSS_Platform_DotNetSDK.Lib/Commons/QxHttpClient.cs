@@ -172,7 +172,7 @@ namespace DSS_Platform_DotNetSDK.Lib.Commons {
         }
 
         public BaseModel<T> Post<T> (string url, String reqJson, bool ignoreHttpErrorrCode = false) {
-            Console.WriteLine(reqJson);
+            // Console.WriteLine(reqJson);
             BaseModel<T> result = new BaseModel<T> ();
             try {
                 var response = Post<T> (url, reqJson, "application/json", true);
@@ -197,7 +197,7 @@ namespace DSS_Platform_DotNetSDK.Lib.Commons {
             } else //不是String 不是byte[] ,那肯定是对象,直接转为对象
             {
                 var json = DefaultEncoding.GetString ((byte[]) buffer);
-                Console.WriteLine (json);
+                // Console.WriteLine (json);
                 // System.Text.Json.JsonSerializerOptions options = new System.Text.Json.JsonSerializerOptions();
                 //options.Converters.Add(new BoolJsonConverter());
                 result = Newtonsoft.Json.JsonConvert.DeserializeObject<T> (json);

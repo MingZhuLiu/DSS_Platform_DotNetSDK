@@ -6,11 +6,13 @@ using DSS_Platform_DotNetSDK.Lib.Models;
 using DSS_Platform_DotNetSDK.Lib.Models.Req;
 using DSS_Platform_DotNetSDK.Lib.Models.Resp;
 using Newtonsoft.Json;
-namespace DSS_Platform_DotNetSDK.Lib {
-    public class DSSClient {
+namespace DSS_Platform_DotNetSDK.Lib
+{
+    public class DSSClient
+    {
         private QxHttpClient httpClient = null;
 
-        private Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings ();
+        private Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
         private string baseUrl = null;
         private string apiUrl = null;
         private string orgUrl = "/admin/rest/api";
@@ -21,10 +23,11 @@ namespace DSS_Platform_DotNetSDK.Lib {
 
         private LoginResponse loginData = null;
 
-        public DSSClient (String ip, int port = 8314) {
+        public DSSClient(String ip, int port = 8314)
+        {
             baseUrl = "http://" + ip + ":" + port;
             // apiUrl = baseUrl + "/admin/rest/api";
-            httpClient = new QxHttpClient ();
+            httpClient = new QxHttpClient();
         }
 
         #region  登录相关
@@ -35,21 +38,31 @@ namespace DSS_Platform_DotNetSDK.Lib {
         /// </summary>
         /// <param name="loginName">用户名</param>
         /// <returns></returns>
-        public BaseModel<PublicKeyResponse> getPublicKey (String loginName) {
-            BaseModel<PublicKeyResponse> result = new BaseModel<PublicKeyResponse> ();
-            try {
-                if (String.IsNullOrWhiteSpace (loginName)) {
-                    result.Failed ("The parameter userName is null!");
-                } else {
-                    var data = httpClient.PostJson<PublicKeyResponse> (baseUrl + "/WPMS/getPublicKey", new QxHttpPara ("loginName", loginName), false);
-                    if (data == null) {
-                        result.Failed ("Server response null!");
-                    } else {
-                        result.Success (data);
+        public BaseModel<PublicKeyResponse> getPublicKey(String loginName)
+        {
+            BaseModel<PublicKeyResponse> result = new BaseModel<PublicKeyResponse>();
+            try
+            {
+                if (String.IsNullOrWhiteSpace(loginName))
+                {
+                    result.Failed("The parameter userName is null!");
+                }
+                else
+                {
+                    var data = httpClient.PostJson<PublicKeyResponse>(baseUrl + "/WPMS/getPublicKey", new QxHttpPara("loginName", loginName), false);
+                    if (data == null)
+                    {
+                        result.Failed("Server response null!");
+                    }
+                    else
+                    {
+                        result.Success(data);
                     }
                 }
-            } catch (Exception ex) {
-                result.Failed (ex);
+            }
+            catch (Exception ex)
+            {
+                result.Failed(ex);
             }
             return result;
         }
@@ -62,33 +75,46 @@ namespace DSS_Platform_DotNetSDK.Lib {
         /// <param name="loginName"></param>
         /// <param name="loginPass"></param>
         /// <returns></returns>
-        public BaseModel<LoginResponse> login (string loginName, string loginPass) {
-            BaseModel<LoginResponse> result = new BaseModel<LoginResponse> ();
-            try {
-                if (String.IsNullOrWhiteSpace (loginName)) {
-                    result.Failed ("The parameter userName is null!");
-                } else if (String.IsNullOrWhiteSpace (loginPass)) {
-                    result.Failed ("The parameter loginPass is null!");
-                } else {
-                    var publicKey = getPublicKey (loginName);
-                    if (publicKey.Flag && publicKey.Data.success) {
-                        var rsa = new RSAHelper (RSAType.RSA, Encoding.UTF8, null, publicKey.Data.publicKey);
-                        var encryptPass = rsa.Encrypt (loginPass);
-                        var data = httpClient.PostJson<LoginResponse> (baseUrl + "/WPMS/login",
-                            new QxHttpPara ("loginName", loginName)
-                            .AddPara ("loginPass", encryptPass), false);
-                        if (data.success) {
+        public BaseModel<LoginResponse> login(string loginName, string loginPass)
+        {
+            BaseModel<LoginResponse> result = new BaseModel<LoginResponse>();
+            try
+            {
+                if (String.IsNullOrWhiteSpace(loginName))
+                {
+                    result.Failed("The parameter userName is null!");
+                }
+                else if (String.IsNullOrWhiteSpace(loginPass))
+                {
+                    result.Failed("The parameter loginPass is null!");
+                }
+                else
+                {
+                    var publicKey = getPublicKey(loginName);
+                    if (publicKey.Flag && publicKey.Data.success)
+                    {
+                        var rsa = new RSAHelper(RSAType.RSA, Encoding.UTF8, null, publicKey.Data.publicKey);
+                        var encryptPass = rsa.Encrypt(loginPass);
+                        var data = httpClient.PostJson<LoginResponse>(baseUrl + "/WPMS/login",
+                            new QxHttpPara("loginName", loginName)
+                            .AddPara("loginPass", encryptPass), false);
+                        if (data.success)
+                        {
                             loginData = data;
                             apiUrl = "?userId=" + data.id + "&username=" + data.loginName + "&token=" + data.token;
                         }
-                        result.Success (data);
-                    } else {
-                        result.Failed (publicKey.Msg);
+                        result.Success(data);
+                    }
+                    else
+                    {
+                        result.Failed(publicKey.Msg);
                     }
 
                 }
-            } catch (Exception ex) {
-                result.Failed (ex);
+            }
+            catch (Exception ex)
+            {
+                result.Failed(ex);
             }
             return result;
         }
@@ -102,19 +128,21 @@ namespace DSS_Platform_DotNetSDK.Lib {
         /// </summary>
         /// <param name="apiQuery"></param>
         /// <returns></returns>
-        public BaseModel<BaseData<List<OrganizeModel>>> QueryOrganizeList (ApiQuery apiQuery = null) {
+        public BaseModel<BaseData<List<OrganizeModel>>> QueryOrganizeList(ApiQuery apiQuery = null)
+        {
 
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseData<List<OrganizeModel>>> ().Failed ("Please invoke login !");
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseData<List<OrganizeModel>>>().Failed("Please invoke login !");
             if (apiQuery == null)
-                apiQuery = new ApiQuery ("admin_002_001");
+                apiQuery = new ApiQuery("admin_002_001");
             else
                 apiQuery.interfaceId = "admin_002_001";
 
-            if (apiQuery.Param.param == null) {
-                apiQuery.Param.param = new Object ();
+            if (apiQuery.Param.param == null)
+            {
+                apiQuery.Param.param = new Object();
             }
-            return httpClient.Post<BaseData<List<OrganizeModel>>> (baseUrl + orgUrl + apiUrl, apiQuery);
+            return httpClient.Post<BaseData<List<OrganizeModel>>>(baseUrl + orgUrl + apiUrl, apiQuery);
         }
 
         /// <summary>
@@ -123,15 +151,16 @@ namespace DSS_Platform_DotNetSDK.Lib {
         /// </summary>
         /// <param name="id">组织 id </param>
         /// <returns></returns>
-        public BaseModel<BaseData<OrganizeModel>> QueryOrganize (int id) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseData<OrganizeModel>> ().Failed ("Please invoke login !");
-            ApiQuery apiQuery = new ApiQuery ();
-            var reqPara = new Dictionary<String, Object> ();
-            reqPara.Add ("id", 1);
+        public BaseModel<BaseData<OrganizeModel>> QueryOrganize(int id)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseData<OrganizeModel>>().Failed("Please invoke login !");
+            ApiQuery apiQuery = new ApiQuery();
+            var reqPara = new Dictionary<String, Object>();
+            reqPara.Add("id", 1);
             apiQuery.Param.param = reqPara;
             apiQuery.interfaceId = "admin_002_003";
-            return httpClient.Post<BaseData<OrganizeModel>> (baseUrl + orgUrl + apiUrl, apiQuery);
+            return httpClient.Post<BaseData<OrganizeModel>>(baseUrl + orgUrl + apiUrl, apiQuery);
         }
 
         /// <summary>
@@ -140,21 +169,29 @@ namespace DSS_Platform_DotNetSDK.Lib {
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public BaseModel<OrganizeEditResp> AddOrganize (OrganizeModel model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<OrganizeEditResp> ().Failed ("Please invoke login !");
-            BaseModel<OrganizeEditResp> result = new BaseModel<OrganizeEditResp> ();
-            if (model == null) {
-                result.Failed ("OrganizeModel is null!");
-            } else if (String.IsNullOrWhiteSpace (model.orgName)) {
-                result.Failed ("orgName is null or empty!");
-            } else if (String.IsNullOrWhiteSpace (model.orgPreCode)) {
-                result.Failed ("orgPreCode is null or empty!");
-            } else {
-                var reqPara = new ApiQuery ();
+        public BaseModel<OrganizeEditResp> AddOrganize(OrganizeModel model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<OrganizeEditResp>().Failed("Please invoke login !");
+            BaseModel<OrganizeEditResp> result = new BaseModel<OrganizeEditResp>();
+            if (model == null)
+            {
+                result.Failed("OrganizeModel is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.orgName))
+            {
+                result.Failed("orgName is null or empty!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.orgPreCode))
+            {
+                result.Failed("orgPreCode is null or empty!");
+            }
+            else
+            {
+                var reqPara = new ApiQuery();
                 reqPara.interfaceId = "admin_002_002";
                 reqPara.Param.param = model;
-                result = httpClient.Post<OrganizeEditResp> (baseUrl + orgUrl + apiUrl, reqPara);
+                result = httpClient.Post<OrganizeEditResp>(baseUrl + orgUrl + apiUrl, reqPara);
             }
             return result;
         }
@@ -165,19 +202,25 @@ namespace DSS_Platform_DotNetSDK.Lib {
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public BaseModel<OrganizeEditResp> EditOrganize (OrganizeModel model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<OrganizeEditResp> ().Failed ("Please invoke login !");
-            BaseModel<OrganizeEditResp> result = new BaseModel<OrganizeEditResp> ();
-            if (model == null) {
-                result.Failed ("OrganizeModel is null!");
-            } else if (String.IsNullOrWhiteSpace (model.id)) {
-                result.Failed ("id is null or empty!");
-            } else {
-                var reqPara = new ApiQuery ();
+        public BaseModel<OrganizeEditResp> EditOrganize(OrganizeModel model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<OrganizeEditResp>().Failed("Please invoke login !");
+            BaseModel<OrganizeEditResp> result = new BaseModel<OrganizeEditResp>();
+            if (model == null)
+            {
+                result.Failed("OrganizeModel is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.id))
+            {
+                result.Failed("id is null or empty!");
+            }
+            else
+            {
+                var reqPara = new ApiQuery();
                 reqPara.interfaceId = "admin_002_005";
                 reqPara.Param.param = model;
-                result = httpClient.Post<OrganizeEditResp> (baseUrl + orgUrl + apiUrl, reqPara);
+                result = httpClient.Post<OrganizeEditResp>(baseUrl + orgUrl + apiUrl, reqPara);
             }
             return result;
         }
@@ -187,19 +230,23 @@ namespace DSS_Platform_DotNetSDK.Lib {
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public BaseModel<OrganizeDeletedResp> DeleteOrganize (String[] ids) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<OrganizeDeletedResp> ().Failed ("Please invoke login !");
-            BaseModel<OrganizeDeletedResp> result = new BaseModel<OrganizeDeletedResp> ();
-            if (ids == null || ids.Length == 0) {
-                result.Failed ("ids is null!");
-            } else {
-                ApiQuery apiQuery = new ApiQuery ();
-                var reqPara = new Dictionary<String, Object> ();
-                reqPara.Add ("ids", String.Join (",", ids));
+        public BaseModel<OrganizeDeletedResp> DeleteOrganize(String[] ids)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<OrganizeDeletedResp>().Failed("Please invoke login !");
+            BaseModel<OrganizeDeletedResp> result = new BaseModel<OrganizeDeletedResp>();
+            if (ids == null || ids.Length == 0)
+            {
+                result.Failed("ids is null!");
+            }
+            else
+            {
+                ApiQuery apiQuery = new ApiQuery();
+                var reqPara = new Dictionary<String, Object>();
+                reqPara.Add("ids", String.Join(",", ids));
                 apiQuery.Param.param = reqPara;
                 apiQuery.interfaceId = "admin_002_004";
-                result = httpClient.Post<OrganizeDeletedResp> (baseUrl + orgUrl + apiUrl, apiQuery);
+                result = httpClient.Post<OrganizeDeletedResp>(baseUrl + orgUrl + apiUrl, apiQuery);
             }
             return result;
         }
@@ -217,19 +264,25 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @return: 
          */
 
-        public BaseModel<BaseReturnData> AddDept (DeptModel model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (model == null) {
-                result.Failed ("DeptModel is null!");
-            } else if (String.IsNullOrWhiteSpace (model.name)) {
-                result.Failed ("deptName is null or empty!");
-            } else {
+        public BaseModel<BaseReturnData> AddDept(DeptModel model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (model == null)
+            {
+                result.Failed("DeptModel is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.name))
+            {
+                result.Failed("deptName is null or empty!");
+            }
+            else
+            {
 
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<BaseReturnData> (baseUrl + CardSolutionUrl + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<BaseReturnData>(baseUrl + CardSolutionUrl + apiUrl, jsonParam);
             }
             return result;
 
@@ -239,18 +292,24 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<DeptUpdateResp> UpdateDept (DeptModel model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<DeptUpdateResp> ().Failed ("Please invoke login !");
-            BaseModel<DeptUpdateResp> result = new BaseModel<DeptUpdateResp> ();
-            if (model == null) {
-                result.Failed ("OrganizeModel is null!");
-            } else if (String.IsNullOrWhiteSpace (model.name)) {
-                result.Failed ("deptName is null or empty!");
-            } else {
+        public BaseModel<DeptUpdateResp> UpdateDept(DeptModel model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<DeptUpdateResp>().Failed("Please invoke login !");
+            BaseModel<DeptUpdateResp> result = new BaseModel<DeptUpdateResp>();
+            if (model == null)
+            {
+                result.Failed("OrganizeModel is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.name))
+            {
+                result.Failed("deptName is null or empty!");
+            }
+            else
+            {
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<DeptUpdateResp> (baseUrl + CardSolutionUrl + "/update" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<DeptUpdateResp>(baseUrl + CardSolutionUrl + "/update" + apiUrl, jsonParam);
             }
             return result;
         }
@@ -259,15 +318,19 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<DeptUpdateResp> DeleteDept (String id) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<DeptUpdateResp> ().Failed ("Please invoke login !");
-            BaseModel<DeptUpdateResp> result = new BaseModel<DeptUpdateResp> ();
-            if (id == null || id.Equals ("")) {
-                result.Failed ("id is null!");
-            } else {
+        public BaseModel<DeptUpdateResp> DeleteDept(String id)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<DeptUpdateResp>().Failed("Please invoke login !");
+            BaseModel<DeptUpdateResp> result = new BaseModel<DeptUpdateResp>();
+            if (id == null || id.Equals(""))
+            {
+                result.Failed("id is null!");
+            }
+            else
+            {
 
-                result = httpClient.Get<DeptUpdateResp> (baseUrl + CardSolutionUrl + "/" + id + apiUrl);
+                result = httpClient.Get<DeptUpdateResp>(baseUrl + CardSolutionUrl + "/" + id + apiUrl);
             }
             return result;
         }
@@ -277,11 +340,12 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<DeptQueryResp> QueryDept () {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<DeptQueryResp> ().Failed ("Please invoke login !");
-            BaseModel<DeptQueryResp> result = new BaseModel<DeptQueryResp> ();
-            result = httpClient.Get<DeptQueryResp> (baseUrl + CardSolutionUrl + apiUrl);
+        public BaseModel<DeptQueryResp> QueryDept()
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<DeptQueryResp>().Failed("Please invoke login !");
+            BaseModel<DeptQueryResp> result = new BaseModel<DeptQueryResp>();
+            result = httpClient.Get<DeptQueryResp>(baseUrl + CardSolutionUrl + apiUrl);
             return result;
         }
 
@@ -294,11 +358,12 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<PersonidentityQueryResp> QueryPersonidentity () {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<PersonidentityQueryResp> ().Failed ("Please invoke login !");
-            BaseModel<PersonidentityQueryResp> result = new BaseModel<PersonidentityQueryResp> ();
-            result = httpClient.Get<PersonidentityQueryResp> (baseUrl + PersonidentityUrl + apiUrl);
+        public BaseModel<PersonidentityQueryResp> QueryPersonidentity()
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<PersonidentityQueryResp>().Failed("Please invoke login !");
+            BaseModel<PersonidentityQueryResp> result = new BaseModel<PersonidentityQueryResp>();
+            result = httpClient.Get<PersonidentityQueryResp>(baseUrl + PersonidentityUrl + apiUrl);
             return result;
         }
 
@@ -310,27 +375,43 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> AddPerson (PersonDtoReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (model == null) {
-                result.Failed ("OrganizeModel is null!");
-            } else if (String.IsNullOrWhiteSpace (model.name)) {
-                result.Failed ("name is null or empty!");
-            } else if (String.IsNullOrWhiteSpace (model.code)) {
-                result.Failed ("code is null or empty!");
-            } else if (String.IsNullOrWhiteSpace (model.paperNumber)) {
-                result.Failed ("paperNumber is null or empty!");
-            } else if (String.IsNullOrWhiteSpace (model.paperType)) {
-                result.Failed ("paperType is null or empty!");
-            } else if (String.IsNullOrWhiteSpace (model.personIdentityId)) {
-                result.Failed ("personIdentityId is null or empty!");
-            } else if (String.IsNullOrWhiteSpace (model.sex)) {
-                result.Failed ("sex is null or empty!");
-            } else {
-                var reqJson=Newtonsoft.Json.JsonConvert.SerializeObject(model);
-                result = httpClient.Post<BaseReturnData> (baseUrl + PersonUrl + apiUrl, reqJson);
+        public BaseModel<BaseReturnData> AddPerson(PersonDtoReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (model == null)
+            {
+                result.Failed("OrganizeModel is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.name))
+            {
+                result.Failed("name is null or empty!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.code))
+            {
+                result.Failed("code is null or empty!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.paperNumber))
+            {
+                result.Failed("paperNumber is null or empty!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.paperType))
+            {
+                result.Failed("paperType is null or empty!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.personIdentityId))
+            {
+                result.Failed("personIdentityId is null or empty!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.sex))
+            {
+                result.Failed("sex is null or empty!");
+            }
+            else
+            {
+                var reqJson = Newtonsoft.Json.JsonConvert.SerializeObject(model);
+                result = httpClient.Post<BaseReturnData>(baseUrl + PersonUrl + apiUrl, reqJson);
             }
             return result;
 
@@ -340,28 +421,22 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> UpdatePerson (PersonDtoReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (model == null) {
-                result.Failed ("OrganizeModel is null!");
-            } else if (String.IsNullOrWhiteSpace (model.name)) {
-                result.Failed ("name is null or empty!");
-            } else if (String.IsNullOrWhiteSpace (model.code)) {
-                result.Failed ("code is null or empty!");
-            } else if (String.IsNullOrWhiteSpace (model.paperNumber)) {
-                result.Failed ("paperNumber is null or empty!");
-            } else if (String.IsNullOrWhiteSpace (model.paperType)) {
-                result.Failed ("paperType is null or empty!");
-            } else if (String.IsNullOrWhiteSpace (model.personIdentityId)) {
-                result.Failed ("personIdentityId is null or empty!");
-            } else if (String.IsNullOrWhiteSpace (model.sex)) {
-                result.Failed ("sex is null or empty!");
-            } else {
-                var reqPara = new ApiQuery ();
-                reqPara.Param.param = model;
-                result = httpClient.Post<BaseReturnData> (baseUrl + PersonUrl + "/update" + apiUrl, reqPara);
+        public BaseModel<BaseReturnData> UpdatePerson(PersonDtoReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (model == null)
+            {
+                result.Failed("PersonDtoReq is null!");
+            }
+            else
+            {
+                // var reqPara = new ApiQuery ();
+                // reqPara.Param.param = model;
+                settings.NullValueHandling = NullValueHandling.Ignore;
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<BaseReturnData>(baseUrl + PersonUrl + "/update" + apiUrl, jsonParam);
             }
             return result;
 
@@ -372,18 +447,22 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> DeletePerson (String[] ids) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (ids == null || ids.Length == 0) {
-                result.Failed ("ids is null!");
-            } else {
-                ApiQuery apiQuery = new ApiQuery ();
-                var reqPara = new Dictionary<String, Object> ();
-                reqPara.Add ("ids", String.Join (",", ids));
+        public BaseModel<BaseReturnData> DeletePerson(String[] ids)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (ids == null || ids.Length == 0)
+            {
+                result.Failed("ids is null!");
+            }
+            else
+            {
+                ApiQuery apiQuery = new ApiQuery();
+                var reqPara = new Dictionary<String, Object>();
+                reqPara.Add("ids", String.Join(",", ids));
                 apiQuery.Param.param = reqPara;
-                result = httpClient.Post<BaseReturnData> (baseUrl + PersonUrl + "/delete" + apiUrl, apiQuery);
+                result = httpClient.Post<BaseReturnData>(baseUrl + PersonUrl + "/delete" + apiUrl, apiQuery);
             }
             return result;
         }
@@ -393,18 +472,24 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<PersonQueryResp> QueryPersonList (PersonQueryReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<PersonQueryResp> ().Failed ("Please invoke login !");
-            BaseModel<PersonQueryResp> result = new BaseModel<PersonQueryResp> ();
-            if (model == null) {
-                result.Failed ("PersonReq is null!");
-            } else if (String.IsNullOrWhiteSpace (model.deptIdsString)) {
-                result.Failed ("deptIdsString is null or empty!");
-            } else {
+        public BaseModel<PersonQueryResp> QueryPersonList(PersonQueryReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<PersonQueryResp>().Failed("Please invoke login !");
+            BaseModel<PersonQueryResp> result = new BaseModel<PersonQueryResp>();
+            if (model == null)
+            {
+                result.Failed("PersonReq is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.deptIdsString))
+            {
+                result.Failed("deptIdsString is null or empty!");
+            }
+            else
+            {
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<PersonQueryResp> (baseUrl + PersonUrl + "/bycondition/combined" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<PersonQueryResp>(baseUrl + PersonUrl + "/bycondition/combined" + apiUrl, jsonParam);
             }
             return result;
         }
@@ -414,20 +499,28 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> SaveImage (ImageReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (model == null) {
-                result.Failed ("ImageReq is null!");
-            } else if (String.IsNullOrWhiteSpace (model.personCode)) {
-                result.Failed ("personCode is null or empty!");
-            } else if (String.IsNullOrWhiteSpace (model.base64file)) {
-                result.Failed ("base64file is null or empty!");
-            } else {
+        public BaseModel<BaseReturnData> SaveImage(ImageReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (model == null)
+            {
+                result.Failed("ImageReq is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.personCode))
+            {
+                result.Failed("personCode is null or empty!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.base64file))
+            {
+                result.Failed("base64file is null or empty!");
+            }
+            else
+            {
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/common/saveMobileBase64ImageToByte" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/common/saveMobileBase64ImageToByte" + apiUrl, jsonParam);
             }
             return result;
         }
@@ -436,38 +529,56 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<PersonListEditResp> AddPersonList (List<PersonModel> models) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<PersonListEditResp> ().Failed ("Please invoke login !");
-            BaseModel<PersonListEditResp> result = new BaseModel<PersonListEditResp> ();
+        public BaseModel<PersonListEditResp> AddPersonList(List<PersonModel> models)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<PersonListEditResp>().Failed("Please invoke login !");
+            BaseModel<PersonListEditResp> result = new BaseModel<PersonListEditResp>();
 
-            if (models == null || models.Count <= 0) {
-                result.Failed ("OrganizeModel is null!");
-            } else {
+            if (models == null || models.Count <= 0)
+            {
+                result.Failed("OrganizeModel is null!");
+            }
+            else
+            {
 
-                foreach (var model in models) {
-                    if (model == null) {
-                        result.Failed ("OrganizeModel is null!");
-                    } else if (String.IsNullOrWhiteSpace (model.name)) {
-                        result.Failed ("name is null or empty!");
-                    } else if (String.IsNullOrWhiteSpace (model.code)) {
-                        result.Failed ("code is null or empty!");
-                    } else if (String.IsNullOrWhiteSpace (model.paperNumber)) {
-                        result.Failed ("paperNumber is null or empty!");
-                    } else if (String.IsNullOrWhiteSpace (model.paperType)) {
-                        result.Failed ("paperType is null or empty!");
-                    } else if (String.IsNullOrWhiteSpace (model.personIdentityId)) {
-                        result.Failed ("personIdentityId is null or empty!");
-                    } else if (String.IsNullOrWhiteSpace (model.sex)) {
-                        result.Failed ("sex is null or empty!");
+                foreach (var model in models)
+                {
+                    if (model == null)
+                    {
+                        result.Failed("OrganizeModel is null!");
+                    }
+                    else if (String.IsNullOrWhiteSpace(model.name))
+                    {
+                        result.Failed("name is null or empty!");
+                    }
+                    else if (String.IsNullOrWhiteSpace(model.code))
+                    {
+                        result.Failed("code is null or empty!");
+                    }
+                    else if (String.IsNullOrWhiteSpace(model.paperNumber))
+                    {
+                        result.Failed("paperNumber is null or empty!");
+                    }
+                    else if (String.IsNullOrWhiteSpace(model.paperType))
+                    {
+                        result.Failed("paperType is null or empty!");
+                    }
+                    else if (String.IsNullOrWhiteSpace(model.personIdentityId))
+                    {
+                        result.Failed("personIdentityId is null or empty!");
+                    }
+                    else if (String.IsNullOrWhiteSpace(model.sex))
+                    {
+                        result.Failed("sex is null or empty!");
                     }
                 }
 
             }
 
             settings.NullValueHandling = NullValueHandling.Ignore;
-            var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (models, settings);
-            result = httpClient.Post<PersonListEditResp> (baseUrl + "/CardSolution/card/person/batch/third" + apiUrl, jsonParam);
+            var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(models, settings);
+            result = httpClient.Post<PersonListEditResp>(baseUrl + "/CardSolution/card/person/batch/third" + apiUrl, jsonParam);
 
             return result;
 
@@ -477,11 +588,12 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> DelPersonByCode (String personCode) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            result = httpClient.Get<BaseReturnData> (baseUrl + "/CardSolution/card/person/deleteByCode/" + personCode + apiUrl);
+        public BaseModel<BaseReturnData> DelPersonByCode(String personCode)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            result = httpClient.Get<BaseReturnData>(baseUrl + "/CardSolution/card/person/deleteByCode/" + personCode + apiUrl);
             return result;
 
         }
@@ -490,12 +602,13 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<PersonQueryByIdResp> QueryPersonById (long id) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<PersonQueryByIdResp> ().Failed ("Please invoke login !");
-            BaseModel<PersonQueryByIdResp> result = new BaseModel<PersonQueryByIdResp> ();
+        public BaseModel<PersonQueryByIdResp> QueryPersonById(long id)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<PersonQueryByIdResp>().Failed("Please invoke login !");
+            BaseModel<PersonQueryByIdResp> result = new BaseModel<PersonQueryByIdResp>();
             var json = "{ \"id\":" + id + "}";
-            result = httpClient.Post<PersonQueryByIdResp> (baseUrl + "/CardSolution/card/person/queryById" + apiUrl, json);
+            result = httpClient.Post<PersonQueryByIdResp>(baseUrl + "/CardSolution/card/person/queryById" + apiUrl, json);
             return result;
 
         }
@@ -504,11 +617,12 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<byte[]> getImage (long id) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<byte[]> ().Failed ("Please invoke login !");
-            BaseModel<byte[]> result = new BaseModel<byte[]> ();
-            result = httpClient.Get<byte[]> (baseUrl + "/CardSolution/common/getImageByte/" + id + apiUrl);
+        public BaseModel<byte[]> getImage(long id)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<byte[]>().Failed("Please invoke login !");
+            BaseModel<byte[]> result = new BaseModel<byte[]>();
+            result = httpClient.Get<byte[]>(baseUrl + "/CardSolution/common/getImageByte/" + id + apiUrl);
             return result;
 
         }
@@ -522,28 +636,34 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> OpenCard (List<CardModel> models) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (models == null || models.Count <= 0) {
-                result.Failed ("OrganizeModel is null!");
-            } else {
+        public BaseModel<BaseReturnData> OpenCard(List<CardModel> models)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (models == null || models.Count <= 0)
+            {
+                result.Failed("OrganizeModel is null!");
+            }
+            else
+            {
 
-                foreach (var model in models) {
-                    if (model.personId == 0) {
-                        result.Failed ("personId is null or empty!");
+                foreach (var model in models)
+                {
+                    if (model.personId == 0)
+                    {
+                        result.Failed("personId is null or empty!");
                     }
 
                 }
 
-                var reqPara = new Dictionary<string, List<CardModel>> ();
-                reqPara.Add ("objectList", models);
+                var reqPara = new Dictionary<string, List<CardModel>>();
+                reqPara.Add("objectList", models);
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (reqPara, settings);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(reqPara, settings);
                 //  jsonParam="{ \"objectList\": [{ \"cardNumber\": \"B7BB4AF0\", \"cardType\": \"0\", \"category\": \"0\", \"cardStatus\": \"ACTIVE\", \"startDate\": \"2020-05-20\", \"endDate\": \"2020-07-19\", \"cardPassword\": \"S+TxzkUL77ftcG4nPB+X81aMLPh4CeLi5IUnik+mhWX6DI+rljSzlkt5ZpDZVaECkbn5b+v5N9YUo+aGjR1fYENw0BNVQqF5IBMFwvXdHbyRUyCKFQ4ssssNV7klFrcwf3OI0vpGwXbGTpHk4FGur6R2qraWOMOzFwdv/5VM8xg=\", \"subSystems\": \"1,3,4,5,6\", \"cardSubsidy\": \"0\", \"cardDeposit\": \"0\", \"cardCash\": \"0\", \"cardCost\": \"0\", \"personId\": 214, \"personName\": \"张三\" }] }";
 
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/card/open/batch" + apiUrl, jsonParam);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/card/open/batch" + apiUrl, jsonParam);
             }
             return result;
 
@@ -553,19 +673,25 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> ReturnCard (CardReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (model == null) {
-                result.Failed ("CardReq is null!");
-            } else if (model.cardIds == null) {
-                result.Failed ("ids is null!");
-            } else {
+        public BaseModel<BaseReturnData> ReturnCard(CardReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (model == null)
+            {
+                result.Failed("CardReq is null!");
+            }
+            else if (model.cardIds == null)
+            {
+                result.Failed("ids is null!");
+            }
+            else
+            {
 
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/card/return" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/card/return" + apiUrl, jsonParam);
             }
 
             return result;
@@ -576,21 +702,29 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> LostCard (CardReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (model == null) {
-                result.Failed ("CardReq is null!");
-            } else if (model.cardIds == null) {
-                result.Failed ("ids is null!");
-            } else if (model.eventCode == 0) {
-                result.Failed ("eventCode is null!");
-            } else {
+        public BaseModel<BaseReturnData> LostCard(CardReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (model == null)
+            {
+                result.Failed("CardReq is null!");
+            }
+            else if (model.cardIds == null)
+            {
+                result.Failed("ids is null!");
+            }
+            else if (model.eventCode == 0)
+            {
+                result.Failed("eventCode is null!");
+            }
+            else
+            {
 
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/card/lose" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/card/lose" + apiUrl, jsonParam);
             }
 
             return result;
@@ -601,19 +735,25 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> RelieveCard (CardReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (model == null) {
-                result.Failed ("CardReq is null!");
-            } else if (model.cardIds == null) {
-                result.Failed ("ids is null!");
-            } else {
+        public BaseModel<BaseReturnData> RelieveCard(CardReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (model == null)
+            {
+                result.Failed("CardReq is null!");
+            }
+            else if (model.cardIds == null)
+            {
+                result.Failed("ids is null!");
+            }
+            else
+            {
 
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/card/relieve" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/card/relieve" + apiUrl, jsonParam);
             }
 
             return result;
@@ -624,21 +764,29 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> ReNewCard (CardReNewReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (model == null) {
-                result.Failed ("CardReq is null!");
-            } else if (String.IsNullOrWhiteSpace (model.newCardNumber)) {
-                result.Failed ("ids is null!");
-            } else if (String.IsNullOrWhiteSpace (model.oldCardNumber)) {
-                result.Failed ("oldCardNumber is null!");
-            } else {
+        public BaseModel<BaseReturnData> ReNewCard(CardReNewReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (model == null)
+            {
+                result.Failed("CardReq is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.newCardNumber))
+            {
+                result.Failed("ids is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.oldCardNumber))
+            {
+                result.Failed("oldCardNumber is null!");
+            }
+            else
+            {
 
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/card/renew" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/card/renew" + apiUrl, jsonParam);
             }
 
             return result;
@@ -649,21 +797,29 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> ChangeCard (CardReNewReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (model == null) {
-                result.Failed ("CardReq is null!");
-            } else if (String.IsNullOrWhiteSpace (model.newCardNumber)) {
-                result.Failed ("ids is null!");
-            } else if (String.IsNullOrWhiteSpace (model.oldCardNumber)) {
-                result.Failed ("oldCardNumber is null!");
-            } else {
+        public BaseModel<BaseReturnData> ChangeCard(CardReNewReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (model == null)
+            {
+                result.Failed("CardReq is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.newCardNumber))
+            {
+                result.Failed("ids is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.oldCardNumber))
+            {
+                result.Failed("oldCardNumber is null!");
+            }
+            else
+            {
 
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/card/changeCard" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/card/changeCard" + apiUrl, jsonParam);
             }
 
             return result;
@@ -674,23 +830,33 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> UpdateCard (CardModel model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (model == null) {
-                result.Failed ("CardReq is null!");
-            } else if (String.IsNullOrWhiteSpace (model.cardPassword)) {
-                result.Failed ("cardPassword is null!");
-            } else if (String.IsNullOrWhiteSpace (model.cardNumber)) {
-                result.Failed ("cardNumber is null!");
-            } else if (String.IsNullOrWhiteSpace (model.endDate)) {
-                result.Failed ("endDate is null!");
-            } else {
+        public BaseModel<BaseReturnData> UpdateCard(CardModel model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (model == null)
+            {
+                result.Failed("CardReq is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.cardPassword))
+            {
+                result.Failed("cardPassword is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.cardNumber))
+            {
+                result.Failed("cardNumber is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.endDate))
+            {
+                result.Failed("endDate is null!");
+            }
+            else
+            {
 
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/card/update" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/card/update" + apiUrl, jsonParam);
             }
             return result;
         }
@@ -699,21 +865,29 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<CardQueryResp> Combined (CardPageReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<CardQueryResp> ().Failed ("Please invoke login !");
-            BaseModel<CardQueryResp> result = new BaseModel<CardQueryResp> ();
-            if (model == null) {
-                result.Failed ("CardReq is null!");
-            } else if (model.pageNum == 0) {
-                result.Failed ("pageNum is null!");
-            } else if (model.pageSize == 0) {
-                result.Failed ("pageSize is null!");
-            } else {
+        public BaseModel<CardQueryResp> Combined(CardPageReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<CardQueryResp>().Failed("Please invoke login !");
+            BaseModel<CardQueryResp> result = new BaseModel<CardQueryResp>();
+            if (model == null)
+            {
+                result.Failed("CardReq is null!");
+            }
+            else if (model.pageNum == 0)
+            {
+                result.Failed("pageNum is null!");
+            }
+            else if (model.pageSize == 0)
+            {
+                result.Failed("pageSize is null!");
+            }
+            else
+            {
 
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<CardQueryResp> (baseUrl + "/CardSolution/card/card/bycondition/combined" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<CardQueryResp>(baseUrl + "/CardSolution/card/card/bycondition/combined" + apiUrl, jsonParam);
             }
 
             return result;
@@ -726,12 +900,13 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnStringData> GetPubKey () {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnStringData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnStringData> result = new BaseModel<BaseReturnStringData> ();
+        public BaseModel<BaseReturnStringData> GetPubKey()
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnStringData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnStringData> result = new BaseModel<BaseReturnStringData>();
 
-            result = httpClient.Get<BaseReturnStringData> (baseUrl + "/CardSolution/rsa/getPubKey" + apiUrl);
+            result = httpClient.Get<BaseReturnStringData>(baseUrl + "/CardSolution/rsa/getPubKey" + apiUrl);
 
             return result;
 
@@ -748,20 +923,28 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<AccessControlPageResp> QueryDevices (DeviceReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<AccessControlPageResp> ().Failed ("Please invoke login !");
-            BaseModel<AccessControlPageResp> result = new BaseModel<AccessControlPageResp> ();
-            if (model == null) {
-                result.Failed ("PageReq is null!");
-            } else if (model.pageNum == 0) {
-                result.Failed ("pageNum is null!");
-            } else if (model.pageNum == 0) {
-                result.Failed ("pageNum is null!");
-            } else {
+        public BaseModel<AccessControlPageResp> QueryDevices(DeviceReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<AccessControlPageResp>().Failed("Please invoke login !");
+            BaseModel<AccessControlPageResp> result = new BaseModel<AccessControlPageResp>();
+            if (model == null)
+            {
+                result.Failed("PageReq is null!");
+            }
+            else if (model.pageNum == 0)
+            {
+                result.Failed("pageNum is null!");
+            }
+            else if (model.pageNum == 0)
+            {
+                result.Failed("pageNum is null!");
+            }
+            else
+            {
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<AccessControlPageResp> (baseUrl + "/CardSolution/card/accessControl/device/bycondition/combined" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<AccessControlPageResp>(baseUrl + "/CardSolution/card/accessControl/device/bycondition/combined" + apiUrl, jsonParam);
             }
             return result;
 
@@ -771,20 +954,28 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<ChannelQueryResp> QueryChannels (ChannelReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<ChannelQueryResp> ().Failed ("Please invoke login !");
-            BaseModel<ChannelQueryResp> result = new BaseModel<ChannelQueryResp> ();
-            if (model == null) {
-                result.Failed ("PageReq is null!");
-            } else if (model.pageNum == 0) {
-                result.Failed ("pageNum is null!");
-            } else if (model.pageNum == 0) {
-                result.Failed ("pageNum is null!");
-            } else {
+        public BaseModel<ChannelQueryResp> QueryChannels(ChannelReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<ChannelQueryResp>().Failed("Please invoke login !");
+            BaseModel<ChannelQueryResp> result = new BaseModel<ChannelQueryResp>();
+            if (model == null)
+            {
+                result.Failed("PageReq is null!");
+            }
+            else if (model.pageNum == 0)
+            {
+                result.Failed("pageNum is null!");
+            }
+            else if (model.pageNum == 0)
+            {
+                result.Failed("pageNum is null!");
+            }
+            else
+            {
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<ChannelQueryResp> (baseUrl + "/CardSolution/card/accessControl/channel/bycondition/combined" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<ChannelQueryResp>(baseUrl + "/CardSolution/card/accessControl/channel/bycondition/combined" + apiUrl, jsonParam);
             }
             return result;
 
@@ -799,20 +990,28 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<ConditionQueryResq> QueryConditions (ConditionReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<ConditionQueryResq> ().Failed ("Please invoke login !");
-            BaseModel<ConditionQueryResq> result = new BaseModel<ConditionQueryResq> ();
-            if (model == null) {
-                result.Failed ("PageReq is null!");
-            } else if (model.pageNum == 0) {
-                result.Failed ("pageNum is null!");
-            } else if (model.pageNum == 0) {
-                result.Failed ("pageNum is null!");
-            } else {
+        public BaseModel<ConditionQueryResq> QueryConditions(ConditionReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<ConditionQueryResq>().Failed("Please invoke login !");
+            BaseModel<ConditionQueryResq> result = new BaseModel<ConditionQueryResq>();
+            if (model == null)
+            {
+                result.Failed("PageReq is null!");
+            }
+            else if (model.pageNum == 0)
+            {
+                result.Failed("pageNum is null!");
+            }
+            else if (model.pageNum == 0)
+            {
+                result.Failed("pageNum is null!");
+            }
+            else
+            {
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<ConditionQueryResq> (baseUrl + "/CardSolution/card/accessControl/timeQuantum/1/page" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<ConditionQueryResq>(baseUrl + "/CardSolution/card/accessControl/timeQuantum/1/page" + apiUrl, jsonParam);
             }
             return result;
 
@@ -822,20 +1021,28 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> AddConditions (ConditionModel model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (model == null) {
-                result.Failed ("PageReq is null!");
-            } else if (String.IsNullOrWhiteSpace (model.detail)) {
-                result.Failed ("detail is null!");
-            } else if (String.IsNullOrWhiteSpace (model.name)) {
-                result.Failed ("name is null!");
-            } else {
+        public BaseModel<BaseReturnData> AddConditions(ConditionModel model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (model == null)
+            {
+                result.Failed("PageReq is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.detail))
+            {
+                result.Failed("detail is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.name))
+            {
+                result.Failed("name is null!");
+            }
+            else
+            {
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/accessControl/timeQuantum" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/accessControl/timeQuantum" + apiUrl, jsonParam);
             }
             return result;
 
@@ -845,20 +1052,28 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> UpdateConditions (ConditionModel model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (model == null) {
-                result.Failed ("PageReq is null!");
-            } else if (String.IsNullOrWhiteSpace (model.detail)) {
-                result.Failed ("detail is null!");
-            } else if (String.IsNullOrWhiteSpace (model.name)) {
-                result.Failed ("name is null!");
-            } else {
+        public BaseModel<BaseReturnData> UpdateConditions(ConditionModel model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (model == null)
+            {
+                result.Failed("PageReq is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.detail))
+            {
+                result.Failed("detail is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.name))
+            {
+                result.Failed("name is null!");
+            }
+            else
+            {
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/accessControl/timeQuantum/update" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/accessControl/timeQuantum/update" + apiUrl, jsonParam);
             }
             return result;
 
@@ -869,18 +1084,22 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> DelConditions (string[] ids) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (ids == null || ids.Length == 0) {
-                result.Failed ("ids is null!");
-            } else {
-                ApiQuery apiQuery = new ApiQuery ();
-                var reqPara = new Dictionary<String, Object> ();
-                reqPara.Add ("ids", String.Join (",", ids));
+        public BaseModel<BaseReturnData> DelConditions(string[] ids)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (ids == null || ids.Length == 0)
+            {
+                result.Failed("ids is null!");
+            }
+            else
+            {
+                ApiQuery apiQuery = new ApiQuery();
+                var reqPara = new Dictionary<String, Object>();
+                reqPara.Add("ids", String.Join(",", ids));
                 apiQuery.Param.param = reqPara;
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/accessControl/timeQuantum/delete" + apiUrl, apiQuery);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/accessControl/timeQuantum/delete" + apiUrl, apiQuery);
             }
             return result;
 
@@ -893,20 +1112,28 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> AddDoorGroup (DoorGroupModel model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (model == null) {
-                result.Failed ("PageReq is null!");
-            } else if (model.doorGroupDetail == null || model.doorGroupDetail.Count == 0) {
-                result.Failed ("doorGroupDetail is null!");
-            } else if (String.IsNullOrWhiteSpace (model.name)) {
-                result.Failed ("name is null!");
-            } else {
+        public BaseModel<BaseReturnData> AddDoorGroup(DoorGroupModel model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (model == null)
+            {
+                result.Failed("PageReq is null!");
+            }
+            else if (model.doorGroupDetail == null || model.doorGroupDetail.Count == 0)
+            {
+                result.Failed("doorGroupDetail is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.name))
+            {
+                result.Failed("name is null!");
+            }
+            else
+            {
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/accessControl/doorGroup" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/accessControl/doorGroup" + apiUrl, jsonParam);
             }
             return result;
 
@@ -916,20 +1143,28 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> UpdateDoorGroup (DoorGroupModel model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (model == null) {
-                result.Failed ("PageReq is null!");
-            } else if (model.doorGroupDetail == null || model.doorGroupDetail.Count == 0) {
-                result.Failed ("doorGroupDetail is null!");
-            } else if (String.IsNullOrWhiteSpace (model.name)) {
-                result.Failed ("name is null!");
-            } else {
+        public BaseModel<BaseReturnData> UpdateDoorGroup(DoorGroupModel model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (model == null)
+            {
+                result.Failed("PageReq is null!");
+            }
+            else if (model.doorGroupDetail == null || model.doorGroupDetail.Count == 0)
+            {
+                result.Failed("doorGroupDetail is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.name))
+            {
+                result.Failed("name is null!");
+            }
+            else
+            {
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/accessControl/doorGroup" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/accessControl/doorGroup" + apiUrl, jsonParam);
             }
             return result;
 
@@ -940,16 +1175,20 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> DelDoorGroup (string[] ids) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (ids == null || ids.Length == 0) {
-                result.Failed ("PageReq is null!");
-            } else {
+        public BaseModel<BaseReturnData> DelDoorGroup(string[] ids)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (ids == null || ids.Length == 0)
+            {
+                result.Failed("PageReq is null!");
+            }
+            else
+            {
 
                 var jsonParam = "{\"doorGroupIds\":" + ids + "}";
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/accessControl/doorGroup/delete/batch" + apiUrl, jsonParam);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/accessControl/doorGroup/delete/batch" + apiUrl, jsonParam);
             }
             return result;
 
@@ -959,14 +1198,18 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<DoorGroupQueryByIdResp> DelDoorGroup (string id) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<DoorGroupQueryByIdResp> ().Failed ("Please invoke login !");
-            BaseModel<DoorGroupQueryByIdResp> result = new BaseModel<DoorGroupQueryByIdResp> ();
-            if (String.IsNullOrWhiteSpace (id)) {
-                result.Failed ("id is null!");
-            } else {
-                result = httpClient.Get<DoorGroupQueryByIdResp> (baseUrl + "/CardSolution/card/accessControl/doorGroup/" + id + apiUrl);
+        public BaseModel<DoorGroupQueryByIdResp> DelDoorGroup(string id)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<DoorGroupQueryByIdResp>().Failed("Please invoke login !");
+            BaseModel<DoorGroupQueryByIdResp> result = new BaseModel<DoorGroupQueryByIdResp>();
+            if (String.IsNullOrWhiteSpace(id))
+            {
+                result.Failed("id is null!");
+            }
+            else
+            {
+                result = httpClient.Get<DoorGroupQueryByIdResp>(baseUrl + "/CardSolution/card/accessControl/doorGroup/" + id + apiUrl);
             }
             return result;
 
@@ -976,18 +1219,26 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<ConditionQueryResq> QueryDoorGroups (ConditionReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<ConditionQueryResq> ().Failed ("Please invoke login !");
-            BaseModel<ConditionQueryResq> result = new BaseModel<ConditionQueryResq> ();
-            if (model == null) {
-                result.Failed ("ConditionReq is null!");
-            } else if (model.pageNum == 0) {
-                result.Failed ("pageNum is null!");
-            } else if (model.pageSize == 0) {
-                result.Failed ("pageSize is null!");
-            } else {
-                result = httpClient.Get<ConditionQueryResq> (baseUrl + "/CardSolution/card/accessControl/doorGroup/bycondition/combined" + apiUrl);
+        public BaseModel<ConditionQueryResq> QueryDoorGroups(ConditionReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<ConditionQueryResq>().Failed("Please invoke login !");
+            BaseModel<ConditionQueryResq> result = new BaseModel<ConditionQueryResq>();
+            if (model == null)
+            {
+                result.Failed("ConditionReq is null!");
+            }
+            else if (model.pageNum == 0)
+            {
+                result.Failed("pageNum is null!");
+            }
+            else if (model.pageSize == 0)
+            {
+                result.Failed("pageSize is null!");
+            }
+            else
+            {
+                result = httpClient.Get<ConditionQueryResq>(baseUrl + "/CardSolution/card/accessControl/doorGroup/bycondition/combined" + apiUrl);
             }
             return result;
 
@@ -1001,22 +1252,32 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> AddCardPrivilege (CardPrivilegeModel model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (model == null) {
-                result.Failed ("CardPrivilegeModel is null!");
-            } else if (model.cardNumbers == null || model.cardNumbers.Length == 0) {
-                result.Failed ("cardNumbers is null!");
-            } else if (String.IsNullOrWhiteSpace (model.timeQuantumId)) {
-                result.Failed ("timeQuantumId is null!");
-            } else if (model.cardPrivilegeDetails == null || model.cardPrivilegeDetails.Count == 0) {
-                result.Failed ("cardPrivilegeDetails is null!");
-            } else {
+        public BaseModel<BaseReturnData> AddCardPrivilege(CardPrivilegeModel model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (model == null)
+            {
+                result.Failed("CardPrivilegeModel is null!");
+            }
+            else if (model.cardNumbers == null || model.cardNumbers.Length == 0)
+            {
+                result.Failed("cardNumbers is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.timeQuantumId))
+            {
+                result.Failed("timeQuantumId is null!");
+            }
+            else if (model.cardPrivilegeDetails == null || model.cardPrivilegeDetails.Count == 0)
+            {
+                result.Failed("cardPrivilegeDetails is null!");
+            }
+            else
+            {
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/accessControl/doorAuthority" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/accessControl/doorAuthority" + apiUrl, jsonParam);
             }
             return result;
 
@@ -1026,22 +1287,32 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> UpdateCardPrivilege (CardPrivilegeModel model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (model == null) {
-                result.Failed ("CardPrivilegeModel is null!");
-            } else if (model.cardNumbers == null || model.cardNumbers.Length == 0) {
-                result.Failed ("cardNumbers is null!");
-            } else if (String.IsNullOrWhiteSpace (model.timeQuantumId)) {
-                result.Failed ("timeQuantumId is null!");
-            } else if (model.cardPrivilegeDetails == null || model.cardPrivilegeDetails.Count == 0) {
-                result.Failed ("cardPrivilegeDetails is null!");
-            } else {
+        public BaseModel<BaseReturnData> UpdateCardPrivilege(CardPrivilegeModel model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (model == null)
+            {
+                result.Failed("CardPrivilegeModel is null!");
+            }
+            else if (model.cardNumbers == null || model.cardNumbers.Length == 0)
+            {
+                result.Failed("cardNumbers is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.timeQuantumId))
+            {
+                result.Failed("timeQuantumId is null!");
+            }
+            else if (model.cardPrivilegeDetails == null || model.cardPrivilegeDetails.Count == 0)
+            {
+                result.Failed("cardPrivilegeDetails is null!");
+            }
+            else
+            {
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/accessControl/doorAuthority/update" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/accessControl/doorAuthority/update" + apiUrl, jsonParam);
             }
             return result;
 
@@ -1051,16 +1322,20 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> DelCardPrivilege (string[] ids) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (ids == null || ids.Length == 0) {
-                result.Failed ("PageReq is null!");
-            } else {
+        public BaseModel<BaseReturnData> DelCardPrivilege(string[] ids)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (ids == null || ids.Length == 0)
+            {
+                result.Failed("PageReq is null!");
+            }
+            else
+            {
 
                 var jsonParam = "{\"cardNums\":" + ids + "}";
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/accessControl/doorAuthority/delete/batch" + apiUrl, jsonParam);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/accessControl/doorAuthority/delete/batch" + apiUrl, jsonParam);
             }
             return result;
 
@@ -1071,20 +1346,28 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<CardPrivilegeQueryResp> QueryCardPrivilege (CardPrivilegeReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<CardPrivilegeQueryResp> ().Failed ("Please invoke login !");
-            BaseModel<CardPrivilegeQueryResp> result = new BaseModel<CardPrivilegeQueryResp> ();
-            if (model == null) {
-                result.Failed ("CardPrivilegeModel is null!");
-            } else if (model.pageSize == null || model.pageSize == 0) {
-                result.Failed ("cardNumbers is null!");
-            } else if (model.pageNum == null || model.pageNum == 0) {
-                result.Failed ("cardNumbers is null!");
-            } else {
+        public BaseModel<CardPrivilegeQueryResp> QueryCardPrivilege(CardPrivilegeReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<CardPrivilegeQueryResp>().Failed("Please invoke login !");
+            BaseModel<CardPrivilegeQueryResp> result = new BaseModel<CardPrivilegeQueryResp>();
+            if (model == null)
+            {
+                result.Failed("CardPrivilegeModel is null!");
+            }
+            else if (model.pageSize == null || model.pageSize == 0)
+            {
+                result.Failed("cardNumbers is null!");
+            }
+            else if (model.pageNum == null || model.pageNum == 0)
+            {
+                result.Failed("cardNumbers is null!");
+            }
+            else
+            {
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<CardPrivilegeQueryResp> (baseUrl + " /CardSolution/card/accessControl/doorAuthority/bycondition/combined" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<CardPrivilegeQueryResp>(baseUrl + " /CardSolution/card/accessControl/doorAuthority/bycondition/combined" + apiUrl, jsonParam);
             }
             return result;
 
@@ -1094,15 +1377,19 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<CardPrivilegeQueryResp> QueryCardPrivilegeByCode (string cardNum) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<CardPrivilegeQueryResp> ().Failed ("Please invoke login !");
-            BaseModel<CardPrivilegeQueryResp> result = new BaseModel<CardPrivilegeQueryResp> ();
-            if (String.IsNullOrWhiteSpace (cardNum)) {
-                result.Failed ("cardNum is null!");
-            } else {
-                var apiQuery = new ApiQuery ();
-                result = httpClient.Post<CardPrivilegeQueryResp> (baseUrl + " /CardSolution/card/accessControl/doorAuthority/" + cardNum + apiUrl, apiQuery);
+        public BaseModel<CardPrivilegeQueryResp> QueryCardPrivilegeByCode(string cardNum)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<CardPrivilegeQueryResp>().Failed("Please invoke login !");
+            BaseModel<CardPrivilegeQueryResp> result = new BaseModel<CardPrivilegeQueryResp>();
+            if (String.IsNullOrWhiteSpace(cardNum))
+            {
+                result.Failed("cardNum is null!");
+            }
+            else
+            {
+                var apiQuery = new ApiQuery();
+                result = httpClient.Post<CardPrivilegeQueryResp>(baseUrl + " /CardSolution/card/accessControl/doorAuthority/" + cardNum + apiUrl, apiQuery);
             }
             return result;
 
@@ -1112,21 +1399,29 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<AcsCardSyncResp> GetAcsCardSyncList (AcsCardSyncReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<AcsCardSyncResp> ().Failed ("Please invoke login !");
-            BaseModel<AcsCardSyncResp> result = new BaseModel<AcsCardSyncResp> ();
+        public BaseModel<AcsCardSyncResp> GetAcsCardSyncList(AcsCardSyncReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<AcsCardSyncResp>().Failed("Please invoke login !");
+            BaseModel<AcsCardSyncResp> result = new BaseModel<AcsCardSyncResp>();
 
-            if (model == null) {
-                result.Failed ("CardPrivilegeModel is null!");
-            } else if (model.pageSize == null || model.pageSize == 0) {
-                result.Failed ("cardNumbers is null!");
-            } else if (model.pageNum == null || model.pageNum == 0) {
-                result.Failed ("cardNumbers is null!");
-            } else {
+            if (model == null)
+            {
+                result.Failed("CardPrivilegeModel is null!");
+            }
+            else if (model.pageSize == null || model.pageSize == 0)
+            {
+                result.Failed("cardNumbers is null!");
+            }
+            else if (model.pageNum == null || model.pageNum == 0)
+            {
+                result.Failed("cardNumbers is null!");
+            }
+            else
+            {
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<AcsCardSyncResp> (baseUrl + " /CardSolution/card/accessControl/doorAuthority/getAcsCardSyncList" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<AcsCardSyncResp>(baseUrl + " /CardSolution/card/accessControl/doorAuthority/getAcsCardSyncList" + apiUrl, jsonParam);
             }
             return result;
 
@@ -1141,20 +1436,28 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> AddOrUpdateAcsFaceSync (AcsFaceSyncReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (model == null) {
-                result.Failed ("PageReq is null!");
-            } else if ((model.resouceCodes == null || model.resouceCodes.Length == 0) && ((model.doorGroupIds == null || model.doorGroupIds.Length == 0))) {
-                result.Failed ("resouceCodes and doorGroupIds is null!");
-            } else if (String.IsNullOrWhiteSpace (model.personCode)) {
-                result.Failed ("personCode is null!");
-            } else {
+        public BaseModel<BaseReturnData> AddOrUpdateAcsFaceSync(AcsFaceSyncReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (model == null)
+            {
+                result.Failed("PageReq is null!");
+            }
+            else if ((model.resouceCodes == null || model.resouceCodes.Length == 0) && ((model.doorGroupIds == null || model.doorGroupIds.Length == 0)))
+            {
+                result.Failed("resouceCodes and doorGroupIds is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.personCode))
+            {
+                result.Failed("personCode is null!");
+            }
+            else
+            {
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/accessControl/doorAuthority/updateForThirdParty" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/accessControl/doorAuthority/updateForThirdParty" + apiUrl, jsonParam);
             }
             return result;
 
@@ -1165,18 +1468,24 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<BaseReturnData> DelAcsFaceSync (AcsFaceSyncReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<BaseReturnData> ().Failed ("Please invoke login !");
-            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData> ();
-            if (model == null) {
-                result.Failed ("PageReq is null!");
-            } else if (String.IsNullOrWhiteSpace (model.personCode)) {
-                result.Failed ("personCode is null!");
-            } else {
+        public BaseModel<BaseReturnData> DelAcsFaceSync(AcsFaceSyncReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (model == null)
+            {
+                result.Failed("PageReq is null!");
+            }
+            else if (String.IsNullOrWhiteSpace(model.personCode))
+            {
+                result.Failed("personCode is null!");
+            }
+            else
+            {
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/accessControl/doorAuthority/faceDelete" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/accessControl/doorAuthority/faceDelete" + apiUrl, jsonParam);
             }
             return result;
 
@@ -1188,20 +1497,28 @@ namespace DSS_Platform_DotNetSDK.Lib {
          * @param {type} 
          * @return: 
          */
-        public BaseModel<AcsCardSyncResp> GetAcsFaceSyncList (AcsFaceSyncListReq model) {
-            if (String.IsNullOrWhiteSpace (apiUrl))
-                return new BaseModel<AcsCardSyncResp> ().Failed ("Please invoke login !");
-            BaseModel<AcsCardSyncResp> result = new BaseModel<AcsCardSyncResp> ();
-            if (model == null) {
-                result.Failed ("PageReq is null!");
-            } else if (model.pageNum == 0) {
-                result.Failed ("pageNum is null!");
-            } else if (model.pageSize == 0) {
-                result.Failed ("pageSize is null!");
-            } else {
+        public BaseModel<AcsCardSyncResp> GetAcsFaceSyncList(AcsFaceSyncListReq model)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<AcsCardSyncResp>().Failed("Please invoke login !");
+            BaseModel<AcsCardSyncResp> result = new BaseModel<AcsCardSyncResp>();
+            if (model == null)
+            {
+                result.Failed("PageReq is null!");
+            }
+            else if (model.pageNum == 0)
+            {
+                result.Failed("pageNum is null!");
+            }
+            else if (model.pageSize == 0)
+            {
+                result.Failed("pageSize is null!");
+            }
+            else
+            {
                 settings.NullValueHandling = NullValueHandling.Ignore;
-                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<AcsCardSyncResp> (baseUrl + "/CardSolution/card/accessControl/doorAuthority/getAcsFaceSyncList" + apiUrl, jsonParam);
+                var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject(model, settings);
+                result = httpClient.Post<AcsCardSyncResp>(baseUrl + "/CardSolution/card/accessControl/doorAuthority/getAcsFaceSyncList" + apiUrl, jsonParam);
             }
             return result;
         }
