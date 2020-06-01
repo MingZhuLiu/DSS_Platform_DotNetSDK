@@ -5,6 +5,9 @@
 ### [Gitub项目地址](https://github.com/MingZhuLiu/DSS_Platform_DotNetSDK)
 
 
+### 大华的个别接口行为和文档描述并不一致,小伙伴们祝好运.
+### 按照大华的接口规范对接很可能会踩到发卡慢,无法刷卡的大坑.
+
 > 核心类库DSS_Platform_DotNetSDK.Lib
 
 > 调用测试DSS_Platform_DotNetSDK.Control

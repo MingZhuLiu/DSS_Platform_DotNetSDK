@@ -54,7 +54,7 @@ namespace DSS_Platform_DotNetSDK.Control
                 person.paperNumber = "BY100103";
                 person.paperType = "学生证";
                 person.personIdentityId = "-99";
-                person.phone = "18918594330";
+                person.phone = "13012345678";
                 person.sex = "男";
                 person.status = "在职";
 
