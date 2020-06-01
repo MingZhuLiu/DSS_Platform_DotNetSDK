@@ -49,7 +49,7 @@ namespace DSS_Platform_DotNetSDK.Control
                 PersonDtoReq person = new PersonDtoReq();
                 person.birthday = "2019-02-12";
                 person.cardNumber = 320204198402140027.ToString();
-                person.code = "00000442";
+                person.code = "59eb648a7a7949a1b";
                 person.deptId = deptIdsStr;
                 person.name = "法外狂徒-云龙";
                 person.paperNumber = "BY10010";
@@ -58,16 +58,21 @@ namespace DSS_Platform_DotNetSDK.Control
                 person.phone = "13912345678";
                 person.sex = "男";
                 person.status = "在职";
+                long peresonId=0;
                 var persons = dSSClient.QueryPersonList(new Lib.Models.Req.PersonQueryReq() { pageNum = 1, pageSize = 1000, deptIdsString = deptIdsStr, cardNumber = person.cardNumber });
                 if (persons.Data.data.totalRows != 0)
                 {
 
                     PersonModel pm = persons.Data.data.pageData.FirstOrDefault();
-                    person.code = pm.code;
+                    peresonId=pm.id;
+                    // person.code = pm.code;
+                    
                 }
                 else
                 {
                     var resp = dSSClient.AddPerson(person);
+                    peresonId=resp.Data.data.Value;
+                    
                 }
 
 
@@ -80,7 +85,7 @@ namespace DSS_Platform_DotNetSDK.Control
                 fileStream.Close();
 
                 ImageReq imageReq = new ImageReq();
-                imageReq.personCode = "00000442";
+                imageReq.personCode = "59eb648a7a7949a1b";
                 imageReq.base64file = Convert.ToBase64String(buffer);
                 var imageResp = dSSClient.SaveImage(imageReq);
 
@@ -101,7 +106,7 @@ namespace DSS_Platform_DotNetSDK.Control
                 }
 
                 var cardModel = new CardModel();
-                cardModel.personId = resp.Data.data;
+                cardModel.personId = peresonId;
                 cardModel.personName = person.name;
                 cardModel.category = "0";
                 cardModel.cardNumber = cardNum;
@@ -133,10 +138,11 @@ namespace DSS_Platform_DotNetSDK.Control
                 //
                 CardPrivilegeModel cardAuthReq = new CardPrivilegeModel();
                 cardAuthReq.cardNumbers = new string[] { cardNum };
+                cardAuthReq.cardNumber = cardNum;
                 cardAuthReq.timeQuantumId = timeConditions.Data.data.pageData.FirstOrDefault()?.id;
                 cardAuthReq.cardPrivilegeDetails = chanels.Data.data.pageData.Select(p => new CardPrivilegeDetailsModel() { privilegeType = "1", resouceCode = p.channelCode }).ToList();
 
-                var authResp = dSSClient.AddCardPrivilege(cardAuthReq);
+                var authResp = dSSClient.UpdateCardPrivilege(cardAuthReq);
 
 
 

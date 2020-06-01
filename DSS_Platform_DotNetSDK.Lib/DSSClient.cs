@@ -1041,7 +1041,7 @@ namespace DSS_Platform_DotNetSDK.Lib {
             } else {
                 settings.NullValueHandling = NullValueHandling.Ignore;
                 var jsonParam = Newtonsoft.Json.JsonConvert.SerializeObject (model, settings);
-                result = httpClient.Post<BaseReturnData> (baseUrl + " /CardSolution/card/accessControl/doorAuthority/update" + apiUrl, jsonParam);
+                result = httpClient.Post<BaseReturnData> (baseUrl + "/CardSolution/card/accessControl/doorAuthority/update" + apiUrl, jsonParam);
             }
             return result;
 
@@ -1207,6 +1207,10 @@ namespace DSS_Platform_DotNetSDK.Lib {
         }
 
         #endregion
+
+
+
+
     }
 
 }

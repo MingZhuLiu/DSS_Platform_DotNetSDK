@@ -172,6 +172,7 @@ namespace DSS_Platform_DotNetSDK.Lib.Commons {
         }
 
         public BaseModel<T> Post<T> (string url, String reqJson, bool ignoreHttpErrorrCode = false) {
+            Console.WriteLine(reqJson);
             BaseModel<T> result = new BaseModel<T> ();
             try {
                 var response = Post<T> (url, reqJson, "application/json", true);
