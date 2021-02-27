@@ -1,0 +1,253 @@
+{
+	"variables": [],
+	"info": {
+		"name": "动环接口测试示例",
+		"_postman_id": "25ed25bd-b1fe-a5a3-c8e3-63749a8a5303",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "历史数据",
+			"description": "",
+			"item": [
+				{
+					"name": "https://10.35.122.134/v1.0/pmms/history/dataList/channelId=1000003$10$0$0&signalCode=18113001&startTime=2020-1-6%2000:00:00&endTime=2020-1-6%2023:59:59&pageNo=1&pageSize=10",
+					"request": {
+						"url": "https://10.35.122.134/v1.0/pmms/history/dataList/channelId=1000003$10$0$0&signalCode=18113001&startTime=2020-1-6%2000:00:00&endTime=2020-1-6%2023:59:59&pageNo=1&pageSize=10",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "JSESSIONID=VQoUqUUt2w2eRSM8SdkrN-fT4ToVztQcaTSIFbhQ;",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "实时数据",
+			"description": "",
+			"item": [
+				{
+					"name": "https://10.35.122.134/v1.0/pmms/real/data/nodeId=001&devChildType=1824&pageNo=1&pageSize=6",
+					"request": {
+						"url": "https://10.35.122.134/v1.0/pmms/real/data/nodeId=001&devChildType=1824&pageNo=1&pageSize=6",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "JSESSIONID=VQoUqUUt2w2eRSM8SdkrN-fT4ToVztQcaTSIFbhQ;",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "https://10.35.122.134/v1.0/pmms/real/data?channelId=1000003$10$0$0",
+					"request": {
+						"url": "https://10.35.122.134/v1.0/pmms/real/data?channelId=1000003$10$0$0",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "JSESSIONID=VQoUqUUt2w2eRSM8SdkrN-fT4ToVztQcaTSIFbhQ;",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "https://10.35.122.134/v1.0/pmms/real/data/channelId=1000003$10$0$0&signalName=123",
+					"request": {
+						"url": "https://10.35.122.134/v1.0/pmms/real/data/channelId=1000003$10$0$0&signalName=123",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "https://10.35.122.134/v1.0/pmms/real/data/db",
+					"request": {
+						"url": "https://10.35.122.134/v1.0/pmms/real/data/db",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "报警数据",
+			"description": "",
+			"item": [
+				{
+					"name": "https://10.35.122.134/v1.0/pmms/alarm/dataList/nodeId=1000003$10$0$0&alarmLevel=&alarmStatus=&startTime=2020-01-06 00:00:00&endTime=2020-01-06 23:59:59&pageNo=1&pageSize=20",
+					"request": {
+						"url": "https://10.35.122.134/v1.0/pmms/alarm/dataList/nodeId=1000003$10$0$0&alarmLevel=&alarmStatus=&startTime=2020-01-06 00:00:00&endTime=2020-01-06 23:59:59&pageNo=1&pageSize=20",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "JSESSIONID=VQoUqUUt2w2eRSM8SdkrN-fT4ToVztQcaTSIFbhQ;",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "https://10.35.122.134/v1.0/pmms/alarm/dataList?deviceId=1000003$10$0$0&alarmLevel=&alarmStatus=&startTime=2020-01-06 00:00:00&endTime=2020-01-06 23:59:59&pageNo=1&pageSize=20",
+					"request": {
+						"url": "https://10.35.122.134/v1.0/pmms/alarm/dataList?deviceId=1000003$10$0$0&alarmLevel=&alarmStatus=&startTime=2020-01-06 00:00:00&endTime=2020-01-06 23:59:59&pageNo=1&pageSize=20",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "JSESSIONID=VQoUqUUt2w2eRSM8SdkrN-fT4ToVztQcaTSIFbhQ;",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "点位数据",
+			"description": "",
+			"item": [
+				{
+					"name": "https://10.35.122.134/v1.0/pmms/signal/dataList/channelIds=1000003$10$0$0&signalTypes=3",
+					"request": {
+						"url": "https://10.35.122.134/v1.0/pmms/signal/dataList/channelIds=1000003$10$0$0&signalTypes=3",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "JSESSIONID=cjCblDFLrDVp5oXf_UQVhK7UZiqYWPE54JgdEsf0;",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "https://10.35.122.134/v1.0/pmms/signal/dataList/devChildTypes=1824&signalTypes=3",
+					"request": {
+						"url": "https://10.35.122.134/v1.0/pmms/signal/dataList/devChildTypes=1824&signalTypes=3",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "JSESSIONID=cjCblDFLrDVp5oXf_UQVhK7UZiqYWPE54JgdEsf0;",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "登录保存会话",
+			"description": "",
+			"item": [
+				{
+					"name": "https://10.35.122.134/v1.0/pmms/login/user-login",
+					"request": {
+						"url": "https://10.35.122.134/v1.0/pmms/login/user-login",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Cookie",
+								"value": "JSESSIONID=VQoUqUUt2w2eRSM8SdkrN-fT4ToVztQcaTSIFbhQ;",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"token\" : \"def201b97ae88a79d407bd8a7a1433a6\",\r\n\t\"userId\" : \"1\",\r\n\t\"userName\" : \"system\"\r\n}\r\n"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "设备管理",
+			"description": "",
+			"item": [
+				{
+					"name": "https://10.35.122.134/v1.0/pmms/dev/data?orgCode=001&fsuName=152新动环&pageNo=1&pageSize=20",
+					"request": {
+						"url": "https://10.35.122.134/v1.0/pmms/dev/data?orgCode=001&fsuName=152新动环&pageNo=1&pageSize=20",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "JSESSIONID=VQoUqUUt2w2eRSM8SdkrN-fT4ToVztQcaTSIFbhQ;",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "通道管理",
+			"description": "",
+			"item": [
+				{
+					"name": "https://10.35.122.134/v1.0/pmms/channel/channelList?deviceId=1000003",
+					"request": {
+						"url": "https://10.35.122.134/v1.0/pmms/channel/channelList?deviceId=1000003",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "JSESSIONID=VQoUqUUt2w2eRSM8SdkrN-fT4ToVztQcaTSIFbhQ;",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

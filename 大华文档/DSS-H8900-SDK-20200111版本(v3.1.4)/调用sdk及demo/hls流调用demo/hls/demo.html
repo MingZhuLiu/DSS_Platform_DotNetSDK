@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="SHORTCUT ICON" href="/favicon.ico" type="image/x-icon">
+  <title>hls demo</title>
+  <script src="hls.min.js"></script>
+  <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+      padding: 10px;
+    }
+    #videoCell {
+      margin-top: 20px;
+      border: 1px solid #000;
+    }
+  </style>
+</head>
+<body>
+<h2>设备信息</h2>
+<form action="">
+  <label for="ip">平台ip地址</label>
+  <input type="text" name="ip" id="ip" onchange="changeDevice()">
+  <label for="deviceId">设备id</label>
+  <input type="text" name="deviceId" id="deviceId" onchange="changeDevice()">
+  <label for="channelId">通道id</label>
+  <input type="text" name="channelId" id="channelId" onchange="changeDevice()">
+</form>
+<div>
+  <span>流地址: </span>
+  <span id="hlsUrl"></span>
+</div>
+<div>
+  <button onclick="loadHls()">Play</button>
+</div>
+<video id="videoCell" src="" style="width: 500px;height: 300px;" controlsList="nodownload" autoplay=""></video>
+<script>
+  var hlsUrl = "http://10.35.120.120:7086/live/cameraid/1000095$0/substream/2.m3u8";
+  document.getElementById("hlsUrl").innerHTML = hlsUrl
+  var hls = new Hls();
+  loadHls()
+  function changeDevice () {
+    var ip = document.getElementById('ip').value;
+    var deviceId = document.getElementById('deviceId').value;
+    var channelId = document.getElementById('channelId').value;
+    var url = "http://"+ip+":7086/live/cameraid/"+deviceId+"$"+channelId+"/substream/2.m3u8";
+    document.getElementById("hlsUrl").innerHTML = url
+    // loadHls()
+  }
+  function loadHls() {
+    var src = document.getElementById("hlsUrl").innerHTML
+    console.log("load:" + src)
+    var video = document.getElementById("videoCell");
+    video.src=src;
+    hls.loadSource(src);
+    hls.attachMedia(video);
+    hls.on(Hls.Events.MANIFEST_PARSED, function(){
+      video.play();
+    });
+  }
+</script>
+</body>
+</html>

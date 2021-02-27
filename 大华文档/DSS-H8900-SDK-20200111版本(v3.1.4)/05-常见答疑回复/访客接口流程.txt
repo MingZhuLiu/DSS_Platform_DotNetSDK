@@ -1,0 +1,8 @@
+1.访客预约 调用 访客子系统接口文档 1.3.8,接口调用成功后,平台上访客状态变为: "预约审批中"
+2.访客预约后需要被访人进行审批,接口为: 访客子系统接口文档 1.3.13,审批通过后,平台上访客状态变为: "预约"
+3.这个时候访客可以拿着身份证去访客机上进行认证,通过后开始下发权限,访客就拥有临时出入的权限了
+
+访客的几个H5页面:
+被访人登录页面: http://{ip:port} /CardSolution/h5/visitoredLogin.html 
+被访人审批页面: http://{ip:port}/CardSolution/h5/visitorNoteCheck.html 
+访客预约页面: http://{ip:port}/CardSolution/h5/visitorOrder.html 

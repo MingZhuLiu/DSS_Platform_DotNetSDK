@@ -1,0 +1,9 @@
+8900平台获取token的步骤如下:
+  方式一:
+    1.获取用于密码加密公钥
+	2.用公钥对密码进行加密,加密方式为RSA加密后再base64编码下
+	3.RSA加密的 KEY_ALGORITHM为:"RSA",SIGNATURE_ALGORITHM为:"MD5withRSA",PADDING为:"RSA/None/PKCS1Padding"
+如果开发语言为java,可以查看 调用sdk及demo里的 SDKClient.login()函数.如果是其他语言的话只能百度下了
+如果用postman调用的话,需要注意:获取公钥和鉴权参数获取接口必须保持同一个request,并且sessionId是一样的,同时每次公钥需要实时获取,因为在服务端公私钥是临时存储在session缓存里的
+  方式二:
+   如果现场8900平台的版本为20200426的话,可以采用方式二,密码不用RSA加密,只需要按照规则进行base64编码就好了,文档示例中给了密码编码前后的对比

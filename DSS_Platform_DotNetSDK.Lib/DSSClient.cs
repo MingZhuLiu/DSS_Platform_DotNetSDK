@@ -695,7 +695,24 @@ namespace DSS_Platform_DotNetSDK.Lib
             }
 
             return result;
+        }
 
+
+        public BaseModel<BaseReturnData> ReturnCard_H8900(string  cardNo)
+        {
+            if (String.IsNullOrWhiteSpace(apiUrl))
+                return new BaseModel<BaseReturnData>().Failed("Please invoke login !");
+            BaseModel<BaseReturnData> result = new BaseModel<BaseReturnData>();
+            if (String.IsNullOrWhiteSpace(cardNo))
+            {
+                result.Failed("CardNo is null or empty!");
+            }
+            else
+            {
+                result = httpClient.Post<BaseReturnData>(baseUrl + "/CardSolution/card/card/returnByNumber/" +cardNo+ apiUrl, "");
+            }
+
+            return result;
         }
         /**
          * @description: 1.3.1.4.3 挂失

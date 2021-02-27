@@ -134,6 +134,7 @@ namespace DSS_Platform_DotNetSDK.Lib.Commons {
             Interlocked.Increment (ref RequestCount);
             Object result = null;
             StringContent content = new StringContent (data, DefaultEncoding, contentType);
+           
             HttpResponseMessage httpResult = _httpClient.PostAsync (new Uri (url), content).Result;
             if (ignoreHttpErrorrCode || httpResult.StatusCode == HttpStatusCode.OK) {
                 var buffer = httpResult.Content.ReadAsByteArrayAsync ().Result;

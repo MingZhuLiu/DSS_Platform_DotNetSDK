@@ -13,9 +13,9 @@ namespace DSS_Platform_DotNetSDK.Control
     {
         static void Main(string[] args)
         {
-            DSSClient dSSClient = new DSSClient("192.168.19.180");
+            DSSClient dSSClient = new DSSClient("10.118.254.200");
             // var publicKeyResp=dSSClient.getPublicKey("system");//1.1.1 获取公钥
-            var loginResp = dSSClient.login("system", "mote12345"); //1.1.2 获取 token 的接口
+            var loginResp = dSSClient.login("ZHGD2021", "dss123456"); //1.1.2 获取 token 的接口
             if (loginResp.Flag && loginResp.Data.success)
             {
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
@@ -28,6 +28,10 @@ namespace DSS_Platform_DotNetSDK.Control
                 return;
             }
 
+            var returnCardResp1 = dSSClient.LostCard(new CardReq() { cardIds = new string[] { "A0000004" } });
+
+
+
 
 
 
@@ -36,7 +40,7 @@ namespace DSS_Platform_DotNetSDK.Control
             var departments = dSSClient.QueryDept();
             var deptIdsArr = departments.Data.data.Select(p => p.id).ToArray();
             var deptIdsStr = String.Join(',', deptIdsArr);
-            deptIdsStr = departments.Data.data.Where(p => p.name == "综合计划部").FirstOrDefault()?.id.ToString();
+            deptIdsStr = departments.Data.data.Where(p => p.name == "华谊集团").FirstOrDefault()?.id.ToString();
 
 
 
@@ -48,12 +52,12 @@ namespace DSS_Platform_DotNetSDK.Control
                 PersonDtoReq person = new PersonDtoReq();
                 // person.birthday = "2019-02-12";
                 // person.cardNumber = xxxxxxxxx.ToString();
-                person.code = "xxxxxxxxx";
+                person.code = "HY100103";
                 person.deptId = deptIdsStr;
-                person.name = "法外狂徒-云龙";
-                person.paperNumber = "BY100103";
+                person.name = "马跃乾";
+                person.paperNumber = "HY100103";
                 person.paperType = "学生证";
-                person.personIdentityId = "-99";
+                person.personIdentityId = "340301198402030013";
                 person.phone = "13012345678";
                 person.sex = "男";
                 person.status = "在职";
@@ -74,21 +78,21 @@ namespace DSS_Platform_DotNetSDK.Control
 
 
                 long peresonId = 0;
-                var persons = dSSClient.QueryPersonList(new Lib.Models.Req.PersonQueryReq() { pageNum = 1, pageSize = 1000, deptIdsString = "1", code = "xxxxxxxxx" });
+                var persons = dSSClient.QueryPersonList(new Lib.Models.Req.PersonQueryReq() { pageNum = 1, pageSize = 1000, deptIdsString = deptIdsStr, code = "A0000004" });
                 if (persons.Data.data.totalRows != 0)
                 {
 
 
                     PersonDtoReq pm = new PersonDtoReq();
                     pm.id = persons.Data.data.pageData.FirstOrDefault().id;
-                    pm.status = "离职";
-                    pm.name = "测试修改姓名";
+                    pm.status = "在职";
+                    pm.name = "刘明珠";
                     pm.personIdentityId = "-99";
-                    pm.sex = "女";
+                    pm.sex = "男";
                     pm.paperNumber="320102196801230000";
                     pm.paperType="身份证";
-                    pm.code="xxxxxxxxx";
-                    pm.deptId="1";
+                    pm.code="A0000004";
+                    pm.deptId=deptIdsStr;
                     var xxx = dSSClient.UpdatePerson(pm);
 
 
@@ -109,13 +113,13 @@ namespace DSS_Platform_DotNetSDK.Control
 
 
 
-                System.IO.FileStream fileStream = new System.IO.FileStream("/Users/mingzhuliu/Downloads/13.jpg", FileMode.Open);
+                System.IO.FileStream fileStream = new System.IO.FileStream("/Users/mingzhuliu/SWAP/myq.jpg", FileMode.Open);
                 byte[] buffer = new byte[fileStream.Length];
                 fileStream.Read(buffer, 0, buffer.Length);
                 fileStream.Close();
 
                 ImageReq imageReq = new ImageReq();
-                imageReq.personCode = "xxxxxxxxx";
+                imageReq.personCode = "HY100103";
                 imageReq.base64file = Convert.ToBase64String(buffer);
                 var imageResp = dSSClient.SaveImage(imageReq);
 
